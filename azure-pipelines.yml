@@ -25,6 +25,11 @@ jobs:
   - task: TerraformInstaller@1
     inputs:
       terraformVersion: 'latest'
+  - task: AWSCLI@1
+    inputs:
+      awsCredentials: 'aws'
+      regionName: 'us-east-1'
+      awsCommand: 
   - script: |
       git clone https://github.com/shrookmuhamed/Terraform_project.git
       cd Terraform_project/day1 
@@ -41,6 +46,11 @@ jobs:
   steps:
   - checkout: self
     persistCredentials: true
+  - task: AWSCLI@1
+    inputs:
+      awsCredentials: 'aws'
+      regionName: 'us-east-1'
+      awsCommand: 
   - task: TerraformInstaller@1
     inputs:
       terraformVersion: 'latest'
