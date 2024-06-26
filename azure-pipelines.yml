@@ -29,7 +29,7 @@ jobs:
     inputs:
       awsCredentials: 'aws'
       regionName: 'us-east-1'
-      awsCommand: 
+      awsCommand: aws help
   - script: |
       git clone https://github.com/shrookmuhamed/Terraform_project.git
       cd Terraform_project/day1 
@@ -50,7 +50,7 @@ jobs:
     inputs:
       awsCredentials: 'aws'
       regionName: 'us-east-1'
-      awsCommand: 
+      awsCommand: aws help
   - task: TerraformInstaller@1
     inputs:
       terraformVersion: 'latest'
