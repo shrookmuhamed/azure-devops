@@ -5,6 +5,14 @@ trigger:
 pr:
   - main
 
+parameters:
+- name: ENV
+  displayName: ENV
+  type: string
+  default: dev
+  values:
+  - dev
+  - prod
 jobs:
 - job: Terraform_Init
   displayName: 'Terraform Init'
@@ -18,7 +26,7 @@ jobs:
     inputs:
       terraformVersion: 'latest'
   - script: |
-      git clone https://github.com/shrookmuhamed/azure-devops/tree/main.git
+      git clone https://github.com/shrookmuhamed/Terraform_project/tree/main/day1.git
       cd azure-devops
     displayName: 'Clone Terraform repository'
 
@@ -39,9 +47,12 @@ jobs:
       terraformVersion: 'latest'
  
   - script: |
-      git clone https://github.com/shrookmuhamed/azure-devops/tree/main.git
+      git clone https://github.com/shrookmuhamed/Terraform_project/tree/main/day1.git
       cd azure-devops
     displayName: 'Clone Terraform repository'
+  - script: |
+      terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
+    displayName: 'Select or Create Terraform Workspace'
 
   - script: terraform plan -out=tfplan
     displayName: 'Terraform Plan'
