@@ -2,14 +2,47 @@
 trigger:
 - main
 
-pool:
-  name: aws-agent
+pr:
+  - main
 
-steps:
-- script: echo Hello, world!
-  displayName: 'Run a one-line script'
+jobs:
+- job: Terraform_Init
+  displayName: 'Terraform Init'
+  pool:
+    name: aws-agent
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+  steps:
+  - checkout: self
+    persistCredentials: true
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 'latest'
+  - script: |
+      git clone https://github.com/shrookmuhamed/azure-devops/tree/main.git
+      cd azure-devops
+    displayName: 'Clone Terraform repository'
+
+  - script: terraform init
+    displayName: 'Terraform Init'
+    workingDirectory: terraform-repo
+
+- job: Terraform_Plan
+  displayName: 'Terraform Plan'
+  dependsOn: Terraform_Init
+  pool:
+    name: aws-agent
+  steps:
+  - checkout: self
+    persistCredentials: true
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 'latest'
+ 
+  - script: |
+      git clone https://github.com/shrookmuhamed/azure-devops/tree/main.git
+      cd azure-devops
+    displayName: 'Clone Terraform repository'
+
+  - script: terraform plan -out=tfplan
+    displayName: 'Terraform Plan'
+   
