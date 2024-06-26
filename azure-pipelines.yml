@@ -26,8 +26,8 @@ jobs:
     inputs:
       terraformVersion: 'latest'
   - script: |
-      git clone https://github.com/shrookmuhamed/Terraform_project/tree/main/day1.git
-      cd azure-devops
+      git clone https://github.com/shrookmuhamed/Terraform_project.git
+      cd Terraform_project/day1 
     displayName: 'Clone Terraform repository'
 
   - script: terraform init
@@ -47,8 +47,8 @@ jobs:
       terraformVersion: 'latest'
  
   - script: |
-      git clone https://github.com/shrookmuhamed/Terraform_project/tree/main/day1.git
-      cd azure-devops
+      git clone https://github.com/shrookmuhamed/Terraform_project.git
+      cd Terraform_project/day1 
     displayName: 'Clone Terraform repository'
   - script: |
       terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
