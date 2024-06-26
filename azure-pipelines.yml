@@ -32,7 +32,6 @@ jobs:
 
   - script: terraform init
     displayName: 'Terraform Init'
-    workingDirectory: terraform-repo
 
 - job: Terraform_Plan
   displayName: 'Terraform Plan'
