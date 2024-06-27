@@ -17,7 +17,7 @@ variables:
 
 jobs:
 - job: Terraform_Plan
-  displayName: 'Terraform Plan'
+  displayName: 'Terraform Plan when PR'
   pool:
     name: aws-agent
 
@@ -33,29 +33,31 @@ jobs:
  
   - script: |
       git clone https://github.com/shrookmuhamed/Terraform_project.git
-      cd Terraform_project/day1  # Adjust this path according to your repository structure
+      cd Terraform_project/day1  
     displayName: 'Clone Terraform repository'
 
-  - script: terraform init
-    displayName: 'Terraform Init'  
-    env:
-      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-      AWS_DEFAULT_REGION: us-east-1
+  # - script: terraform init
+  #   displayName: 'Terraform Init'  
+  #   env:
+  #     AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+  #     AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+  #     AWS_DEFAULT_REGION: us-east-1
 
   - script: |
+      terraform init
       terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
-    displayName: 'Select or Create Terraform Workspace and init'
+      terraform plan -out=tfplan
+    displayName: 'init/Select or Create Terraform Workspace/plan '
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
       AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
       AWS_DEFAULT_REGION: us-east-1
 
-  - script: |
-      terraform plan -out=tfplan
-    displayName: 'Terraform Plan'
-    env:
-      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-      AWS_DEFAULT_REGION: us-east-1
+  # - script: |
+  #     terraform plan -out=tfplan
+  #   displayName: 'Terraform Plan'
+  #   env:
+  #     AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+  #     AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+  #     AWS_DEFAULT_REGION: us-east-1
 
