@@ -12,7 +12,8 @@ parameters:
   values:
     - dev
     - prod
-
+variables:
+- group: aws-credentials
 jobs:
 - job: Terraform_Init
   displayName: 'Terraform Init'
@@ -36,6 +37,11 @@ jobs:
   - script: terraform init
     displayName: 'Terraform Init'
     workingDirectory: Terraform_project/day1  
+    env:
+      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+      AWS_DEFAULT_REGION: us-east-1
+
 
 - job: Terraform_Plan
   displayName: 'Terraform Plan'
@@ -67,3 +73,8 @@ jobs:
   - script: |
       terraform plan -out=tfplan
     displayName: 'Terraform Plan'
+    env:
+      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+      AWS_DEFAULT_REGION: us-east-1
+
