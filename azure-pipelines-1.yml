@@ -1,4 +1,4 @@
-#Second pipeline, triggered when there is a Merge / CD depends on CI 
+#Second pipeline,CD depends on CI 
 trigger:
   - main
 pr:
