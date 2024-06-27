@@ -1,6 +1,8 @@
 #Second pipeline, triggered when there is a Merge / CD depends on CI 
 trigger:
   - main
+pr:
+  - main
 
 parameters:
 - name: ENV
@@ -14,7 +16,7 @@ parameters:
 - name: ACTION
   displayName: 'Action'
   type: string
-  default: 'apply'
+  default: 'destroy'
   values:
     - 'apply'
     - 'destroy'
@@ -40,17 +42,16 @@ jobs:
  
   - script: |
       git clone https://github.com/shrookmuhamed/Terraform_project.git
-      cd Terraform_project/day1  
-    displayName: 'Clone Terraform repository'
-
-  - script: |
+      cd Terraform_project/day1 
       terraform init
-      terraform plan -out=tfplan
-    displayName: 'plan'
+      terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
+      terraform plan --var-file ${{ parameters.ENV }}.tfvars
+    displayName: 'init/Select or Create Terraform Workspace/plan '
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
       AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
       AWS_DEFAULT_REGION: us-east-1
+
 
 
 - job: Terraform_Apply_Destroy
@@ -70,26 +71,11 @@ jobs:
       - script: |
           git clone https://github.com/shrookmuhamed/Terraform_project.git
           cd Terraform_project/day1 
-        displayName: 'Clone Terraform repository'
-
-      - script: |
-          terraform init -backend-config="backend.tfvars"
-        displayName: 'Terraform Init'
-        workingDirectory: Terraform_project/day1
-        env:
-          AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-          AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-          AWS_DEFAULT_REGION: 'us-east-1'  # Adjust region as necessary
-
-      - script: |
           terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
-        displayName: 'Select or Create Terraform Workspace'
-
-      - script: |
           if [ "${{ parameters.ACTION }}" == "apply" ]; then
-            terraform apply -auto-approve --var-file ${params.ENV}.tfvars
+            terraform apply -auto-approve --var-file ${{ parameters.ENV }}.tfvars
           elif [ "${{ parameters.ACTION }}" == "destroy" ]; then
-            terraform destroy -auto-approve --var-file ${params.ENV}.tfvars
+            terraform destroy -auto-approve --var-file ${{ parameters.ENV }}.tfvars
           else
             echo "Invalid ACTION parameter specified."
             exit 1
@@ -98,4 +84,4 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
           AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-          AWS_DEFAULT_REGION: 'us-east-1' y
+          AWS_DEFAULT_REGION: 'us-east-1' 
