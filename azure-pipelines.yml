@@ -35,7 +35,7 @@ jobs:
       git clone https://github.com/shrookmuhamed/Terraform_project.git
       cd Terraform_project/day1  # Adjust this path according to your repository structure
     displayName: 'Clone Terraform repository'
-    
+
   - script: terraform init
     displayName: 'Terraform Init'  
     env:
@@ -46,6 +46,10 @@ jobs:
   - script: |
       terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
     displayName: 'Select or Create Terraform Workspace and init'
+    env:
+      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+      AWS_DEFAULT_REGION: us-east-1
 
   - script: |
       terraform plan -out=tfplan
