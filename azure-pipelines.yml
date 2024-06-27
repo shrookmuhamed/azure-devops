@@ -14,38 +14,10 @@ parameters:
     - prod
 variables:
 - group: aws-credentials
+
 jobs:
-- job: Terraform_Init
-  displayName: 'Terraform Init'
-  pool:
-    name: aws-agent
-
-  steps:
-  - checkout: self
-    persistCredentials: true
-
-  - task: TerraformInstaller@1
-    inputs:
-      terraformVersion: 'latest'
-
-
-  - script: |
-      git clone https://github.com/shrookmuhamed/Terraform_project.git
-      cd Terraform_project/day1  
-    displayName: 'Clone Terraform repository'
-
-  - script: terraform init
-    displayName: 'Terraform Init'
-    workingDirectory: Terraform_project/day1  
-    env:
-      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-      AWS_DEFAULT_REGION: us-east-1
-
-
 - job: Terraform_Plan
   displayName: 'Terraform Plan'
-  dependsOn: Terraform_Init
   pool:
     name: aws-agent
 
@@ -59,16 +31,15 @@ jobs:
       terraformVersion: 'latest'
 
  
-
-
   - script: |
       git clone https://github.com/shrookmuhamed/Terraform_project.git
       cd Terraform_project/day1  # Adjust this path according to your repository structure
     displayName: 'Clone Terraform repository'
 
   - script: |
+      terraform init
       terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
-    displayName: 'Select or Create Terraform Workspace'
+    displayName: 'Select or Create Terraform Workspace and init'
 
   - script: |
       terraform plan -out=tfplan
