@@ -1,0 +1,101 @@
+#Second pipeline, triggered when there is a Merge / CD depends on CI 
+trigger:
+  - main
+
+parameters:
+- name: ENV
+  displayName: ENV
+  type: string
+  default: dev
+  values:
+    - dev
+    - prod
+  
+- name: ACTION
+  displayName: 'Action'
+  type: string
+  default: 'apply'
+  values:
+    - 'apply'
+    - 'destroy'
+
+variables:
+- group: aws-credentials
+
+jobs:
+- job: Terraform_Plan
+  displayName: 'Terraform Plan'
+  pool:
+    name: aws-agent
+
+  steps:
+  - checkout: self
+    persistCredentials: true
+
+
+  - task: TerraformInstaller@1
+    inputs:
+      terraformVersion: 'latest'
+
+ 
+  - script: |
+      git clone https://github.com/shrookmuhamed/Terraform_project.git
+      cd Terraform_project/day1  
+    displayName: 'Clone Terraform repository'
+
+  - script: |
+      terraform init
+      terraform plan -out=tfplan
+    displayName: 'plan'
+    env:
+      AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+      AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+      AWS_DEFAULT_REGION: us-east-1
+
+
+- job: Terraform_Apply_Destroy
+  displayName: 'Terraform Apply or Destroy'
+  dependsOn: Terraform_Plan
+  pool:
+    name: aws-agent
+
+    steps:
+      - checkout: self
+        persistCredentials: true
+
+      - task: TerraformInstaller@1
+        inputs:
+          terraformVersion: 'latest'
+
+      - script: |
+          git clone https://github.com/shrookmuhamed/Terraform_project.git
+          cd Terraform_project/day1 
+        displayName: 'Clone Terraform repository'
+
+      - script: |
+          terraform init -backend-config="backend.tfvars"
+        displayName: 'Terraform Init'
+        workingDirectory: Terraform_project/day1
+        env:
+          AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+          AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+          AWS_DEFAULT_REGION: 'us-east-1'  # Adjust region as necessary
+
+      - script: |
+          terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
+        displayName: 'Select or Create Terraform Workspace'
+
+      - script: |
+          if [ "${{ parameters.ACTION }}" == "apply" ]; then
+            terraform apply -auto-approve --var-file ${params.ENV}.tfvars
+          elif [ "${{ parameters.ACTION }}" == "destroy" ]; then
+            terraform destroy -auto-approve --var-file ${params.ENV}.tfvars
+          else
+            echo "Invalid ACTION parameter specified."
+            exit 1
+          fi
+        displayName: 'Terraform Apply or Destroy'
+        env:
+          AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+          AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+          AWS_DEFAULT_REGION: 'us-east-1' y
