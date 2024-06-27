@@ -47,7 +47,7 @@ jobs:
   - script: |
       terraform init
       terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
-      terraform plan --var-file ${params.ENV}.tfvars
+      terraform plan -out=tfplan
     displayName: 'init/Select or Create Terraform Workspace/plan '
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
