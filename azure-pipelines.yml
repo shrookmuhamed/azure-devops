@@ -32,10 +32,10 @@ jobs:
       terraformVersion: 'latest'
 
  
-  - script: |
-      git clone https://github.com/shrookmuhamed/Terraform_project.git
-      cd Terraform_project/day1  
-    displayName: 'Clone Terraform repository'
+  # - script: |
+  #     git clone https://github.com/shrookmuhamed/Terraform_project.git
+  #     cd Terraform_project/day1  
+  #   displayName: 'Clone Terraform repository'
 
   # - script: terraform init
   #   displayName: 'Terraform Init'  
@@ -45,9 +45,11 @@ jobs:
   #     AWS_DEFAULT_REGION: us-east-1
 
   - script: |
+      git clone https://github.com/shrookmuhamed/Terraform_project.git
+      cd Terraform_project/day1 
       terraform init
       terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
-      terraform plan -out=tfplan
+      terraform plan --var-file ${params.ENV}.tfvars
     displayName: 'init/Select or Create Terraform Workspace/plan '
     env:
       AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
