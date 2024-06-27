@@ -71,6 +71,7 @@ jobs:
     - script: |
           git clone https://github.com/shrookmuhamed/Terraform_project.git
           cd Terraform_project/day1 
+          terraform init
           terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
           if [ "${{ parameters.ACTION }}" == "apply" ]; then
             terraform apply -auto-approve --var-file ${{ parameters.ENV }}.tfvars
