@@ -60,15 +60,15 @@ jobs:
   pool:
     name: aws-agent
 
-    steps:
-      - checkout: self
-        persistCredentials: true
+  steps:
+    - checkout: self
+      persistCredentials: true
 
-      - task: TerraformInstaller@1
-        inputs:
-          terraformVersion: 'latest'
+    - task: TerraformInstaller@1
+      inputs:
+        terraformVersion: 'latest'
 
-      - script: |
+    - script: |
           git clone https://github.com/shrookmuhamed/Terraform_project.git
           cd Terraform_project/day1 
           terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
@@ -80,8 +80,8 @@ jobs:
             echo "Invalid ACTION parameter specified."
             exit 1
           fi
-        displayName: 'Terraform Apply or Destroy'
-        env:
-          AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
-          AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
-          AWS_DEFAULT_REGION: 'us-east-1' 
+      displayName: 'Terraform Apply or Destroy'
+      env:
+        AWS_ACCESS_KEY_ID: $(AWS_ACCESS_KEY_ID)
+        AWS_SECRET_ACCESS_KEY: $(AWS_SECRET_ACCESS_KEY)
+        AWS_DEFAULT_REGION: 'us-east-1' 
