@@ -37,7 +37,7 @@ jobs:
     displayName: 'Clone Terraform repository'
 
   - script: |
-      terraform init
+      terraform init -backend-config="backend.tfvars"
       terraform workspace select ${{ parameters.ENV }} || terraform workspace new ${{ parameters.ENV }}
     displayName: 'Select or Create Terraform Workspace and init'
 
